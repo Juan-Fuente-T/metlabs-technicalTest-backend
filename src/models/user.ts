@@ -7,4 +7,4 @@
       }
     // Un array para almacenar los usuarios en memoria (luego será un archivo JSON)
     // Temporalmente mientras no se use una base de datos
-    export let users: User[] = [];
+    // export let users: User[] = [];

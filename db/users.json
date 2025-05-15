@@ -1,0 +1,12 @@
+[
+  {
+    "id": "5e43da0a-4ab7-480a-8c7b-20dfc64f11b2",
+    "email": "user@prueba.com",
+    "passwordHash": "$2b$10$Twin.H1Mh7An7QsnN7KAhecuwzrwKqhAKsrBO6gAD2Ka0gCsv7x8G"
+  },
+  {
+    "id": "8e7bb4e8-605f-4893-9d1d-e303213dacf6",
+    "email": "prueba@registro.com",
+    "passwordHash": "$2b$10$rW3d3Fb60XgSCqny0zQgCO9hrnNwez.HKtafboM3kiANJQrNhyrI."
+  }
+]

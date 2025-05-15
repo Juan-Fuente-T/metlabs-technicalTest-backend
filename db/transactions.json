@@ -1,0 +1,26 @@
+[
+  {
+    "id": "3c961bec-7ba0-41af-a14d-1e2b727e7265",
+    "transactionHash": "Hash de prueba",
+    "userAddress": "address mas falsa que un billete de 13 euros",
+    "createdAt": "2025-05-15T13:55:54.111Z"
+  },
+  {
+    "id": "b27343e9-d0d0-46c1-960e-852243b689ba",
+    "transactionHash": "0x648ad06350c345b7d0dbbd8774e08201b992025be2aa18de1e9898451c26bcd2",
+    "userAddress": "0xe67F18c5064f12470Efc943798236edF45CF3Afb",
+    "createdAt": "2025-05-15T21:47:57.778Z"
+  },
+  {
+    "id": "f7b38c7d-8e63-4bd3-a069-6709a6ad66f6",
+    "transactionHash": "0x6a9798d2974709ec667bfc5bf00f6fe9b11dd325ba450a13cb12104804207cee",
+    "userAddress": "0xe67F18c5064f12470Efc943798236edF45CF3Afb",
+    "createdAt": "2025-05-15T21:49:01.329Z"
+  },
+  {
+    "id": "5610fa70-7e2f-4ecd-924c-0be1a31f5c9a",
+    "transactionHash": "0xbb92ecb94dfd17869a7f0e3ae3901d4d79aaa39cc228223572d57e86513b4b74",
+    "userAddress": "0xe67F18c5064f12470Efc943798236edF45CF3Afb",
+    "createdAt": "2025-05-15T21:51:15.145Z"
+  }
+]
