@@ -7,8 +7,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { readDbFile, writeDbFile } from '../utils/dbUtils';
 import { USERS_DB_PATH } from '../config/dbPaths';
 import config from '../config/config';
-
-
+import { OAuth2Client } from 'google-auth-library';
 
 // Función para registrar un nuevo usuario
 export const registerUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -118,6 +117,109 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
       token,
       user: userResponse
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const loginOrRegisterWithGoogle = async (req: Request, res: Response, next: NextFunction) => {
+  if (!config.googleClientId || config.googleClientId === "ID_NO_CONFIGURADO_REVISAR_ENV") {
+    console.error('GOOGLE_CLIENT_ID no configurado en el backend para OAuth2Client.');
+    // Devuelve un error o se maneja esta situación adecuadamente
+    res.status(500).json({ message: 'Error de configuración del servidor para Google Login.' });
+    return; 
+  }
+  
+  const googleClient = new OAuth2Client(config.googleClientId)
+
+  try {
+    const { idToken } = req.body; // El frontend envía el idToken de Google
+
+    if (!idToken) {
+      res.status(400).json({ message: 'ID Token de Google no proporcionado.' });
+      return;
+    }
+    if (!config.googleClientId) { // Verifica que el Client ID esté cargado en el backend
+        console.error('GOOGLE_CLIENT_ID no configurado en el backend.');
+        res.status(500).json({ message: 'Error de configuración del servidor para Google Login.' });
+        return;
+    }
+
+    // Verifica el ID Token con Google
+    let ticket;
+    try {
+      ticket = await googleClient.verifyIdToken({
+        idToken: idToken,
+        audience: config.googleClientId, // Especifica el Client ID como audiencia
+      });
+    } catch (verifyError) {
+      console.error('Error verificando el ID token de Google:', verifyError);
+      res.status(401).json({ message: 'Token de Google inválido o expirado.' });
+      return; 
+    }
+    
+    const googlePayload = ticket?.getPayload();
+
+    if (!googlePayload || !googlePayload.sub || !googlePayload.email) {
+      res.status(400).json({ message: 'No se pudo obtener la información del usuario desde el token de Google.' });
+      return; 
+    }
+
+    const googleId = googlePayload.sub;
+    const email = googlePayload.email;
+    // const name = googlePayload.name; // Puede usarse para guardar el nombre
+    // const picture = googlePayload.picture; // Y la imagen de perfil
+
+    let currentUsers = await readDbFile(USERS_DB_PATH) as User[];
+    let user = currentUsers.find(u => u.googleId === googleId); // Busca por googleId primero
+
+    if (!user) { // Si no se encontró por googleId, busca por email
+      user = currentUsers.find(u => u.email === email);
+      if (user) {
+        // Usuario encontrado por email, pero no tiene googleId (ej. se registró con email/pass)
+        // Enlaza la cuenta añadiendo el googleId
+        user.googleId = googleId;
+        // Opcional: Actualizar otros datos si vienen de Google y son más recientes
+      } else {
+        // Usuario no encontrado ni por googleId ni por email: Crear nuevo usuario
+        const newUser: User = {
+          id: uuidv4(),
+          email: email,
+          // Para usuarios de Google, el passwordHash no es relevante para login con Google.
+          // Podría ponerse un valor placeholder o dejarlo vacío si la BD lo permite,
+          // o un hash de una contraseña aleatoria muy larga que nunca se usará.
+          passwordHash: await bcrypt.hash(uuidv4() + Date.now(), 10), // Placeholder seguro
+          googleId: googleId, // Guarda el ID de Google
+          // name: name, // Si se quiere guardar el nombre
+          // profilePictureUrl: picture, // Si se quiere guardar la imagen
+          walletAddress: undefined, // O un valor inicial
+        };
+        currentUsers.push(newUser);
+        user = newUser;
+      }
+      // Guardar cambios en users.json (si se actualizó un usuario existente o se creó uno nuevo)
+      await writeDbFile(USERS_DB_PATH, currentUsers);
+    }
+    // Generar el PROPIO token JWT para la sesión de tu aplicación
+    const appTokenPayload = {
+      userId: user.id,
+      email: user.email,
+    };
+
+    const appToken = jwt.sign(
+      appTokenPayload,
+      config.jwtSecret,
+      { expiresIn: '1h' }
+    );
+
+    //  Enviar respuesta con el token y datos básicos del usuario
+    const userResponse = { id: user.id, email: user.email, walletAddress: user.walletAddress };
+    res.status(200).json({
+      message: 'Inicio de sesión con Google exitoso.',
+      token: appToken,
+      user: userResponse
+    });
+
   } catch (error) {
     next(error);
   }

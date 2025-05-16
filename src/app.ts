@@ -12,7 +12,7 @@ app.use(cors());
 
 app.use(express.json());
 
-console.log("¡Hola desde src/index.ts!");
+console.log("¡Hola desde src/app.ts!");
 
 //Ruta de prueba
 app.get('/', (req: any, res: { send: (arg0: string) => void; }) => {

@@ -13,5 +13,11 @@
     "id": "360c125a-2e9c-4f18-ac83-3511843310e2",
     "email": "burra@vella",
     "passwordHash": "$2b$10$Ok7Q5D.EKSlblSae.yHFIeJrsZfYadd1eOfjbxE7EXbOK2Q/Ifnru"
+  },
+  {
+    "id": "0bbde236-1bc0-4956-946e-54739c551a43",
+    "email": "jfuentet@gmail.com",
+    "passwordHash": "$2b$10$zI4t/h10PKIpwp.rLip0a.T8oMgxkRx9BKcki7FLGvPr/VkFsamkS",
+    "googleId": "100112017411476875619"
   }
 ]
