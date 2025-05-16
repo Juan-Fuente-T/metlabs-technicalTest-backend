@@ -2,10 +2,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { User } from '../models/user';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import { v4 as uuidv4 } from 'uuid';
 import { readDbFile, writeDbFile } from '../utils/dbUtils';
 import { USERS_DB_PATH } from '../config/dbPaths';
-
+import config from '../config/config';
 
 
 
@@ -48,10 +49,21 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
     console.log('[DEBUG] 2  Contenido de currentUsers ANTES de escribir:', JSON.stringify(currentUsers, null, 2).substring(0, 300) + "..."); 
     await writeDbFile(USERS_DB_PATH, currentUsers);
 
-    // 6. Enviar respuesta (NO enviar NUNCA el passwordHash al cliente)
+    // 6. Crear el JWT
+    const payload = {
+      userId: newUser.id,
+      email: newUser.email,
+    };
+
+    const token = jwt.sign(
+      payload,
+      config.jwtSecret,
+      { expiresIn: '1h' } 
+    );
+    // 7. Enviar respuesta (NO enviar NUNCA el passwordHash al cliente)
     // Se podría devolver solo un mensaje, o el usuario sin el hash
     const userResponse = { id: newUser.id, email: newUser.email };
-    res.status(201).json({ message: 'Usuario registrado exitosamente', user: userResponse });
+    res.status(201).json({ message: 'Usuario registrado exitosamente', token, user: userResponse});
     // No hay 'return' aquí; la función termina después de enviar la respuesta.
     // TypeScript inferirá Promise<void> para esta ruta de ejecución exitosa.
   } catch (error) {
@@ -63,6 +75,11 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
 export const loginUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = req.body;
+
+    if (!email || !password) {
+      res.status(400).json({ message: 'Email y contraseña son requeridos.' });
+      return;
+    }
 
     // 1. Leer los usuarios existentes del archivo JSON
     const currentUsers = await readDbFile(USERS_DB_PATH) as User[];
@@ -81,9 +98,26 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
       return;
     }
 
-    // 3. Enviar respuesta
-    const userResponse = { id: user.id, email: user.email };
-    res.status(200).json({ message: 'Inicio de sesión exitoso', user: userResponse });
+    // 3. Si las credenciales son correctas, CREAR EL TOKEN JWT
+    const payload = {
+      userId: user.id,
+      email: user.email,
+      // Se puede añadir más info al payload, pero mejor ligero
+    };
+
+    const token = jwt.sign(
+      payload,
+      config.jwtSecret, 
+      { expiresIn: '1h' } 
+    );
+
+    // 4. Enviar respuesta con el token con datos básicos del usuario
+    const userResponse = { id: user.id, email: user.email, walletAddress: user.walletAddress };
+    res.status(200).json({ 
+      message: 'Inicio de sesión exitoso', 
+      token,
+      user: userResponse
+    });
   } catch (error) {
     next(error);
   }
@@ -91,6 +125,7 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
 
 //Función para obtener todos los usuarios
 //REVISAR
+//TODO: Habría que comprobar que tiene permiso comparando los IDs
 export const getUsers = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const currentUsers = await readDbFile(USERS_DB_PATH) as User[];
@@ -111,6 +146,7 @@ export const getUsers = async (req: Request, res: Response, next: NextFunction) 
 
 // Función para obtener un usuario por ID
 // REVISAR
+//TODO: Habria que comprobar que tiene permiso, comparando los IDs
 export const getuserById = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const currentUsers = await readDbFile(USERS_DB_PATH) as User[];

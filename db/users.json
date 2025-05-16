@@ -8,5 +8,10 @@
     "id": "8e7bb4e8-605f-4893-9d1d-e303213dacf6",
     "email": "prueba@registro.com",
     "passwordHash": "$2b$10$rW3d3Fb60XgSCqny0zQgCO9hrnNwez.HKtafboM3kiANJQrNhyrI."
+  },
+  {
+    "id": "360c125a-2e9c-4f18-ac83-3511843310e2",
+    "email": "burra@vella",
+    "passwordHash": "$2b$10$Ok7Q5D.EKSlblSae.yHFIeJrsZfYadd1eOfjbxE7EXbOK2Q/Ifnru"
   }
 ]

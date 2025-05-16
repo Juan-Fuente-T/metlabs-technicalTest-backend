@@ -22,5 +22,19 @@
     "transactionHash": "0xbb92ecb94dfd17869a7f0e3ae3901d4d79aaa39cc228223572d57e86513b4b74",
     "userAddress": "0xe67F18c5064f12470Efc943798236edF45CF3Afb",
     "createdAt": "2025-05-15T21:51:15.145Z"
+  },
+  {
+    "id": "3f658ae1-ff0e-4a10-a743-d3c52f3cc2b0",
+    "transactionHash": "0x502f42925dcc848d7b08ac8d7a441018765238547820b0ca728567f5141eedcd",
+    "userAddress": "0xe67F18c5064f12470Efc943798236edF45CF3Afb",
+    "type": "deposit",
+    "createdAt": "2025-05-15T22:22:05.974Z"
+  },
+  {
+    "id": "b99a92a3-3848-4ae8-b49c-9fd0948d99f0",
+    "transactionHash": "0xf2dc97318b7a6fc4f762edcb0a44e67f1f1bdf0e492c9119e3a661be72e99a25",
+    "userAddress": "0xe67F18c5064f12470Efc943798236edF45CF3Afb",
+    "type": "withdraw",
+    "createdAt": "2025-05-15T22:28:25.442Z"
   }
 ]
