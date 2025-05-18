@@ -1,11 +1,10 @@
+import { TransactionTypeValue } from "../utils/constants";
+
 export interface Transaction {
     id: string;
     transactionHash: string;
     userAddress: string;
-    type: 'deposit' | 'withdraw';
+    type: TransactionTypeValue; // 'deposit' o 'withdraw'
     createdAt?: Date;
   }
   
-// Un array para almacenar las transacciones en memoria (luego será un archivo JSON)
-// Temporalmente mientras no se use una base de datos
-// export let transactions: Transaction[] = [];

@@ -3,6 +3,7 @@ import { Request, Response, NextFunction } from 'express';
 import { Transaction } from '../models/transaction';
 import { v4 as uuidv4 } from 'uuid'; // Para generar IDs únicos mejorados
 import { readDbFile, writeDbFile } from '../utils/dbUtils';
+import { TRANSACTION_TYPES, TransactionTypeValue } from '../utils/constants';
 import { TRANSACTIONS_DB_PATH } from '../config/dbPaths';
 
 // Función para añadir una nueva transacción
@@ -16,30 +17,25 @@ export const addTransaction = async (req: Request, res: Response, next: NextFunc
             return;
         }
         // Validar que 'type' sea uno de los valores esperados
-        if (type !== 'deposit' && type !== 'withdraw') {
+        if (type !== TRANSACTION_TYPES.DEPOSIT && type !== TRANSACTION_TYPES.WITHDRAW) {
             res.status(400).json({ message: 'El campo "type" debe ser "deposit" o "withdraw".' });
             return;
         }
         // Aquí se podrían añadir validaciones más robustas (ej. formato del hash, formato de la dirección)
         
-        console.log('[DEBUG] transactionHash:', transactionHash);
-        console.log('[DEBUG] userAddress:', userAddress);
-        console.log('[DEBUG] type:', type);
+        // Lee las transacciones existentes del archivo JSON
         const currentTransactions = await readDbFile(TRANSACTIONS_DB_PATH) as Transaction[];
-        console.log('[DEBUG] currentTransactions:', currentTransactions);
 
         // 2. Crear la nueva transacción
         const newTransaction: Transaction = {
             id: uuidv4(), // Usar UUID como ID mejorado
             transactionHash,
             userAddress,
-            type,
+            type: type as TransactionTypeValue, // Asegurarse de que el tipo es correcto
             createdAt: new Date()
         };
         // 3. Guardar la transacción (en array en memoria por ahora) y reemplazarlo en el archivo JSON
-        console.log('[DEBUG] 1  Contenido de currentTransactions ANTES de escribir:', JSON.stringify(currentTransactions, null, 2).substring(0, 300) + "...");
         currentTransactions.push(newTransaction);
-        console.log('[DEBUG] 2  Contenido de currentUsers ANTES de escribir:', JSON.stringify(currentTransactions, null, 2).substring(0, 300) + "...");
         await writeDbFile(TRANSACTIONS_DB_PATH, currentTransactions);
         
         // 4. Enviar respuesta

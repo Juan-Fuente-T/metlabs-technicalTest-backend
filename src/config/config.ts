@@ -8,8 +8,6 @@ interface Config {
   googleClientId: string;
 }
 const googleClientIdFromEnv = process.env.GOOGLE_CLIENT_ID;
-console.log("process.env.GOOGLE_CLIENT_ID", process.env.GOOGLE_CLIENT_ID);
-console.log("process.env.JWT_SECRET", process.env.JWT_SECRET);
 
 if (!googleClientIdFromEnv) {
   console.error("ERROR FATAL: La variable de entorno GOOGLE_CLIENT_ID no está definida.");
